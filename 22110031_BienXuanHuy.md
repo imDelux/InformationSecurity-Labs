@@ -84,13 +84,15 @@ My idea is I will use system() to execute task1, which generated above. In order
 
 Consider the stack frame of the main function of task1.c.
 
-<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/27c1eede74a38d40582d209a1ad113acdb2d19ec/images/task1/mainstackframe.png"><br>
+<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/df4e5886a438efa58ca5f62a86a4dca38be1529f/images/task1/mainstackframe.png"><br>
 
 I will replace the return address with the address of system(), set argc to the address of exit(), and set argv to the address of task1. This way, when the program returns, it will run system() as the return address is popped off the stack.
 
+### 2. Conduct the attack
+
 Now I need to find three thing: address of system(), address of exit(), address of task1. Here's the steps:
 
-### 1. Compile task1.c and turn off OS's address space layout randomization
+#### 1. Compile task1.c and turn off OS's address space layout randomization
 
 Compiling task1.c and turning off OS's address space layout randomization using these commands:
 
@@ -99,7 +101,26 @@ sudo sysctl -w kernel.randomize_va_space=0
 gcc -g task1.c -o task1.out -fno-stack-protector -mpreferred-stack-boundary=2 -z execstack
 ```
 
-### 2. Run gdb and find system 
+#### 2. Run gdb and find necessary addresses
+
+Running following commands:
+
+```
+gdb -q task1.out
+start
+p system
+p exit
+```
+
+Here's the result:
+
+<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/df4e5886a438efa58ca5f62a86a4dca38be1529f/images/task1/address.jpg"><br>
+
+Address of system(): 0xf7e50db0
+
+Address of exit(): 0xf7e449e0
+
+
 
 **Conclusion**: comment text about the screenshot or simply answered text for the question
 
