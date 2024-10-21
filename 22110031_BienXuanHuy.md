@@ -120,6 +120,18 @@ Address of system(): 0xf7e50db0
 
 Address of exit(): 0xf7e449e0
 
+To find address of task1, I quit the gdb and run this command:
+
+```
+objdump -d task1
+```
+
+Here's the result:
+
+<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/3a30229f26831b4a06f5cef45e2ba8ade49aa0fb/images/task1/task1.jpg"><br>
+
+Observing the result, the address of task1 is: 0x08048060
+
 
 
 **Conclusion**: comment text about the screenshot or simply answered text for the question
