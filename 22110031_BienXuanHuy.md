@@ -180,9 +180,19 @@ Result:
 
 <img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/2562028aa8e07a5365f2f3d537dda862ca804e06/images/task1/catResult.jpg"><br>
 
-The content of /etc/passwd is copied to this file.
+Check content in /etc/passwd:
 
-To check 
+Command:
+
+```
+cat /etc/passwd
+```
+
+Result:
+
+<img width="500" alt="Screenshot" src="https://github.com/leonart-delux/informationsecurity-labs/blob/659e6ad814b8adce5dac15e38439d511277c7040/images/task1/check.jpg"><br>
+
+The content of /etc/passwd matches the content in /tmp/outfile.
 
 **Conclusion**: Task successfully.
 
