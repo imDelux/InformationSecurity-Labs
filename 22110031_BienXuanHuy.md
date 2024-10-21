@@ -142,8 +142,9 @@ Here's the attack command:
 
 The first 20 bytes will overflow the buffer memory and the ebp, followed by the addresses we expect.
 
+After running command, I got error: sh: 1: T�‼: not found
 
-**Conclusion**: comment text about the screenshot or simply answered text for the question
+**Conclusion**: Task failed
 
 # Task 2: Attack on database of DVWA
 - Install dvwa (on host machine or docker container)
