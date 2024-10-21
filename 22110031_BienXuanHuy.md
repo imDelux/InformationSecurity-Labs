@@ -69,6 +69,10 @@ _start:
 
 ```
 **Question 1**:
+- Compile asm program and C program to executable code. 
+- Conduct the attack so that when C program is executed, the /etc/passwd file is copied to /tmp/pwfile. You are free to choose Code Injection or Environment Variable approach to do. 
+- Write step-by-step explanation and clearly comment on instructions and screenshots that you have made to successfully accomplished the attack.
+**Answer 1**: 
 
 ### 1. Preparation
 
@@ -142,9 +146,24 @@ Here's the attack command:
 
 The first 20 bytes will overflow the buffer memory and the ebp, followed by the addresses we expect.
 
-After running command, I got error: sh: 1: T�‼: not found
+After running command, I got error: sh: 1: T ‼: not found
 
 **Conclusion**: Task failed
 
+# Task 2: Attack on database of DVWA
+- Install dvwa (on host machine or docker container)
+- Make sure you can login with default user
+- Install sqlmap
+- Write instructions and screenshots in the answer sections. Strictly follow the below structure for your writeup. 
 
-AAAA
+**Question 1**: Use sqlmap to get information about all available databases
+**Answer 1**:
+
+**Question 2**: Use sqlmap to get tables, users information
+**Answer 2**:
+
+**Question 3**: Make use of John the Ripper to disclose the password of all database users from the above exploit
+**Answer 3**:
+
+
+
