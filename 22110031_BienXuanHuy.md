@@ -92,6 +92,8 @@ Consider the stack frame of the main function of env.c.
 
 I will replace data in return address with the address of system(), set argc to the address of exit(). Since task1 is placed on disk so in order to run it I will saved its path in an environment variable named VULNP, then place address of that variable in argv. This way, when the program returns, it will run system() as the return address is popped off the stack.
 
+I replace exit() in argc since stack will consider argc as return address of system() when I redirect program flow to system(). Additionally, argv will be considered as argument of system(), which will be the path of the executable program.  
+
 Command to create environment variable:
 
 ```
